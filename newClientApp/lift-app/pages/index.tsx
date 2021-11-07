@@ -51,8 +51,10 @@ const Home: NextPage = () => {
     setLoading(false);
   }
   const getLifts = async () => {
+    setLoading(true);
     const lifts = await LiftsSVC.fetchUrl(`${restApi}/Lifts`);
     setLifts(lifts);
+    setLoading(false);
   }
   const startSignalR = async() => {
     try {
@@ -61,7 +63,11 @@ const Home: NextPage = () => {
           .configureLogging(LogLevel.Information)
           .build();
 
-      connection.on("ReceiveMessage", (time, status, floor) => {
+      connection.on("ReceiveMessage", async (time, status, floor, id, floorsItCanGoUpTo) => {
+          LiftsSVC.uploadLiftLog(floor, status, restApi)
+          LiftsSVC.putLift(floor, status, restApi, id, floorsItCanGoUpTo)
+          const lifts = await LiftsSVC.fetchUrl(`${restApi}/Lifts`);
+          setLifts(lifts);
           setMessages(messages => [...messages, {calledOn: time, status: status, currentFloor: floor} ]);
           
       });
@@ -72,10 +78,10 @@ const Home: NextPage = () => {
       console.log(e);
   }
   }
-  const sendLift = async (index: number) => {
+  const sendLift = async (index: number, id : Number) => {
     try {
       if (connection !== undefined) {
-      await connection.invoke("SendMessage", parseInt(floorToGo[index]), lifts[index].currentFloor);
+      await connection.invoke("SendMessage", lifts[index].currentFloor,  parseInt(floorToGo[index]), id, lifts[index].floorsItCanGoUpTo);
       }
     } catch (e) {
       console.log(e);
@@ -100,6 +106,7 @@ const Home: NextPage = () => {
           </span>
           <Button onClick={toggleColorMode} mt={6}>Dark mode</Button>
           <Table variant="simple">
+          {loading && <Spinner mt={3} alignItems="center" justifyContent="center" display="flex" />}
             <TableCaption>Lifts</TableCaption>
             <Thead>
               <Tr>
@@ -121,10 +128,10 @@ const Home: NextPage = () => {
                     <Td>{direction}</Td>
                     <Td isNumeric>{floorsItCanGoUpTo}</Td>
                     <Td >
-                    <Input placeholder="Current floor" variant="filled" ml={3} mb={3} type="text" value={floorToGo[index]} onChange={(event:React.ChangeEvent<HTMLInputElement>) => handleFloorChange(event, index)}></Input>
+                    <Input placeholder="Current floor" variant="filled" ml={3} mb={3} type="number" value={floorToGo[index]} onChange={(event:React.ChangeEvent<HTMLInputElement>) => handleFloorChange(event, index)}></Input>
                     </Td>
                     <Td >
-                      <Button onClick={() => sendLift(index)} ml={3} mb={3}>Post</Button>
+                      <Button onClick={() => sendLift(index, id)} ml={3} mb={3}>Post</Button>
                     </Td>
                   </Tr>
                 )
@@ -132,9 +139,10 @@ const Home: NextPage = () => {
               }
             </Tbody>
           </Table>
-          <Message  formBackground={formBackground} messages={messages}></Message>
-          {loading && <Spinner mt={3} alignItems="center" justifyContent="center" />}
+
+
         </Flex>
+        <Message  formBackground={formBackground} messages={messages}></Message>
       </Flex>
     </div>
   );

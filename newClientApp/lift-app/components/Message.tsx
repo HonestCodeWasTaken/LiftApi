@@ -16,7 +16,7 @@ interface IMessageProps {
 }
 export const Message: React.FC<IMessageProps> = (props: IMessageProps) => {
   return (
-    <div>
+    <div style={{marginLeft:"15px"}}>
       <Heading mb={6}>
         {"Messages"}
       </Heading>

@@ -44,28 +44,36 @@ namespace LiftApi.Hubs
             await SendUsersConnected(userConnection.Room);
         }
 
-        public async Task SendMessage(int currentFloor, int goToFloor)
+        public async Task SendMessage(int currentFloor, int goToFloor, int idOfElevator, int floorsElevatorCanGoUpTo)
         {
+            if (floorsElevatorCanGoUpTo < goToFloor || goToFloor < 1)
+            {
+                await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Bad floor selection", currentFloor, idOfElevator, floorsElevatorCanGoUpTo);
+                return;
+            }
+            await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Opening up", currentFloor, idOfElevator, floorsElevatorCanGoUpTo);
             await Task.Delay(2000);
-
+            await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Closing", currentFloor, idOfElevator, floorsElevatorCanGoUpTo);
             if (currentFloor < goToFloor)
             {
                 for (int i = currentFloor; i <= goToFloor; i++)
                 {
+                    await Clients.All.SendAsync("ReceiveMessage",DateTime.Now, "Going up", i, idOfElevator, floorsElevatorCanGoUpTo);
                     await Task.Delay(1000);
-                    await Clients.All.SendAsync("ReceiveMessage",DateTime.Now, "Up", i);
                 }
             }
             else
             {
                 for (int i = currentFloor; i >= goToFloor; i--)
                 {
+                    await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Going down", i, idOfElevator, floorsElevatorCanGoUpTo);
                     await Task.Delay(1000);
-                    await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Down", i);
                 }
             }
+            await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Opening up", goToFloor, idOfElevator, floorsElevatorCanGoUpTo);
             await Task.Delay(2000);
-            await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Waiting", goToFloor);
+            await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Closing", goToFloor, idOfElevator, floorsElevatorCanGoUpTo);
+            await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Waiting", goToFloor, idOfElevator, floorsElevatorCanGoUpTo);
         }
 
         public Task SendUsersConnected(string room)

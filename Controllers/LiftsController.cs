@@ -47,11 +47,7 @@ namespace LiftApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLift(int id, Lift lift)
         {
-            if (id != lift.Id)
-            {
-                return BadRequest();
-            }
-
+            lift.Id = id;
             _context.Entry(lift).State = EntityState.Modified;
 
             try
