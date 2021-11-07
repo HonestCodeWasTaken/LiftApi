@@ -76,6 +76,7 @@ namespace LiftApi.Controllers
         [HttpPost]
         public async Task<ActionResult<LiftLog>> PostLiftLog(LiftLog liftLog)
         {
+            liftLog.CalledOn = DateTime.Now;
             _context.LiftLog.Add(liftLog);
             await _context.SaveChangesAsync();
 

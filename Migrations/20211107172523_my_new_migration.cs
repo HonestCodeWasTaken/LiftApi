@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LiftApi.Migrations
 {
-    public partial class InitialDbCreate : Migration
+    public partial class my_new_migration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,7 +13,7 @@ namespace LiftApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CalledOn = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
+                    CalledOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(100)", nullable: true),
                     CurrentFloor = table.Column<int>(type: "int", nullable: false)
                 },

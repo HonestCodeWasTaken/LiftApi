@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react'
 import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
 
-export const DashboardC: React.FC = (props) => {
+export const NavbarCustom: React.FC = (props) => {
 
   const [navSize, changeNavSize] = useState("large")
   return (

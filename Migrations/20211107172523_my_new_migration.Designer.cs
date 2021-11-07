@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LiftApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211105122120_InitialDbCreate")]
-    partial class InitialDbCreate
+    [Migration("20211107172523_my_new_migration")]
+    partial class my_new_migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -52,10 +52,8 @@ namespace LiftApi.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<byte[]>("CalledOn")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<DateTime>("CalledOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("CurrentFloor")
                         .HasColumnType("int");

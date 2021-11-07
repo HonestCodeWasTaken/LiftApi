@@ -50,10 +50,8 @@ namespace LiftApi.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<byte[]>("CalledOn")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                    b.Property<DateTime>("CalledOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("CurrentFloor")
                         .HasColumnType("int");

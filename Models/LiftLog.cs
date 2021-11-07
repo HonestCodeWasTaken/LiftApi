@@ -11,8 +11,8 @@ namespace LiftApi.Models
     {
         [Key]
         public int Id { get; set; }
-        [Timestamp]
-        public byte[] CalledOn { get; set; }
+
+        public DateTime CalledOn { get; set; }
         [Column(TypeName = "nvarchar(100)")]
         public string Status { get; set; }
         [Required]
