@@ -13,6 +13,7 @@ namespace LiftApi.Hubs
     {
         private readonly string _botUser;
         private readonly IDictionary<string, UserConnection> _connections;
+        private readonly ApplicationDbContext _context;
 
         public ChatHub(IDictionary<string, UserConnection> connections)
         {
@@ -43,18 +44,28 @@ namespace LiftApi.Hubs
             await SendUsersConnected(userConnection.Room);
         }
 
-        public async Task SendMessage(string message, int goToFloor)
+        public async Task SendMessage(int currentFloor, int goToFloor)
         {
-            List<Lift> m = JsonConvert.DeserializeObject<List<Lift>>(message);
-            if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+            await Task.Delay(2000);
+
+            if (currentFloor < goToFloor)
             {
-                for (int i = m[0].CurrentFloor; i <= goToFloor; i++)
+                for (int i = currentFloor; i <= goToFloor; i++)
                 {
                     await Task.Delay(1000);
-                    await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", userConnection.User, string.Format("lift is at - {0}",i));
+                    await Clients.All.SendAsync("ReceiveMessage",DateTime.Now, "Up", i);
                 }
-                await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", userConnection.User, "Lift has arrived");
             }
+            else
+            {
+                for (int i = currentFloor; i >= goToFloor; i--)
+                {
+                    await Task.Delay(1000);
+                    await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Down", i);
+                }
+            }
+            await Task.Delay(2000);
+            await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Waiting", goToFloor);
         }
 
         public Task SendUsersConnected(string room)

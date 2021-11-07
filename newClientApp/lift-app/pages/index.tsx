@@ -20,22 +20,30 @@ import {
   TableCaption,
 } from "@chakra-ui/react"
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { Message } from "../components/Message";
+import { IMessage } from "../interfaces/IMessage";
 
 const Home: NextPage = () => {
   const restApi = "https://localhost:44390/api"
   const [currFloor, setCurrFloor] = useState("");
   const [lifts, setLifts] = useState<Array<ILift>>([]);
   const [floorLimit, setFloorLimit] = useState("");
+  const [floorToGo, setFloorToGo] = useState<Array<string>>([]);
   const [loading, setLoading] = useState(false);
   const [connection, setConnection] = useState<HubConnection>();
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Array<IMessage>>([]);
   const { addToast } = useToasts();
 
   const formBackground = useColorModeValue("gray.100", "gray.700")
   const { toggleColorMode } = useColorMode()
 
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => setCurrFloor(event.target.value)
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => setFloorLimit(event.target.value)
+  const handleCurrFloorChange = (event: React.ChangeEvent<HTMLInputElement>) => setCurrFloor(event.target.value)
+  const handleFloorLimitChange = (event: React.ChangeEvent<HTMLInputElement>) => setFloorLimit(event.target.value)
+  const handleFloorChange = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    let arrayOfFloors = floorToGo.slice()
+    arrayOfFloors[index] = event.target.value
+    setFloorToGo(arrayOfFloors)
+  }
 
   const postLift = async () => {
     setLoading(true);
@@ -46,32 +54,35 @@ const Home: NextPage = () => {
     const lifts = await LiftsSVC.fetchUrl(`${restApi}/Lifts`);
     setLifts(lifts);
   }
-  const startSignalR = async(user, room) => {
+  const startSignalR = async() => {
     try {
       const connection = new HubConnectionBuilder()
           .withUrl("https://localhost:44390/chat")
           .configureLogging(LogLevel.Information)
           .build();
 
-      connection.on("ReceiveMessage", (user, message) => {
-          setMessages(messages => [...messages, { user, message }]);
+      connection.on("ReceiveMessage", (time, status, floor) => {
+          setMessages(messages => [...messages, {calledOn: time, status: status, currentFloor: floor} ]);
           
       });
 
-
-      connection.onclose(e => {
-          setConnection();
-          setMessages([]);
-      });
-
       await connection.start();
-      await connection.invoke("JoinRoom", { user, room });
       setConnection(connection);
   } catch (e) {
       console.log(e);
   }
   }
+  const sendLift = async (index: number) => {
+    try {
+      if (connection !== undefined) {
+      await connection.invoke("SendMessage", parseInt(floorToGo[index]), lifts[index].currentFloor);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
   useEffect(() => {
+    startSignalR();
     getLifts();
   }, []);
 
@@ -83,8 +94,8 @@ const Home: NextPage = () => {
             {"Lifts"}
           </Heading>
           <span style={{ justifyContent: "center", alignItems: "center", display: "flex" }}>
-            <Input placeholder="Current floor" variant="filled" ml={3} mb={3} type="text" value={currFloor} onChange={handleUsernameChange}></Input>
-            <Input placeholder="Floor limit" variant="filled" ml={3} mb={3} type="text" value={floorLimit} onChange={handleEmailChange}></Input>
+            <Input placeholder="Current floor" variant="filled" ml={3} mb={3} type="text" value={currFloor} onChange={handleCurrFloorChange}></Input>
+            <Input placeholder="Floor limit" variant="filled" ml={3} mb={3} type="text" value={floorLimit} onChange={handleFloorLimitChange}></Input>
             <Button onClick={postLift} ml={3} mb={3}>Post</Button>
           </span>
           <Button onClick={toggleColorMode} mt={6}>Dark mode</Button>
@@ -96,6 +107,7 @@ const Home: NextPage = () => {
                 <Th>Status</Th>
                 <Th>Direction</Th>
                 <Th isNumeric>Floors It Can Go Up To</Th>
+                <Th isNumeric>Which floor?</Th>
                 <Th isNumeric>Call lift</Th>
               </Tr>
             </Thead>
@@ -109,7 +121,10 @@ const Home: NextPage = () => {
                     <Td>{direction}</Td>
                     <Td isNumeric>{floorsItCanGoUpTo}</Td>
                     <Td >
-                      <Button onClick={postLift} ml={3} mb={3}>Post</Button>
+                    <Input placeholder="Current floor" variant="filled" ml={3} mb={3} type="text" value={floorToGo[index]} onChange={(event:React.ChangeEvent<HTMLInputElement>) => handleFloorChange(event, index)}></Input>
+                    </Td>
+                    <Td >
+                      <Button onClick={() => sendLift(index)} ml={3} mb={3}>Post</Button>
                     </Td>
                   </Tr>
                 )
@@ -117,7 +132,7 @@ const Home: NextPage = () => {
               }
             </Tbody>
           </Table>
-          <Message users={users} formBackground={formBackground} messages={messages}></Message>
+          <Message  formBackground={formBackground} messages={messages}></Message>
           {loading && <Spinner mt={3} alignItems="center" justifyContent="center" />}
         </Flex>
       </Flex>
