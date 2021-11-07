@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LiftApi.Controllers;
+using LiftApi.Models;
+using Newtonsoft.Json;
 
 namespace LiftApi.Hubs
 {
@@ -40,11 +43,17 @@ namespace LiftApi.Hubs
             await SendUsersConnected(userConnection.Room);
         }
 
-        public async Task SendMessage(string message)
+        public async Task SendMessage(string message, int goToFloor)
         {
+            List<Lift> m = JsonConvert.DeserializeObject<List<Lift>>(message);
             if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
-                await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", userConnection.User, message);
+                for (int i = m[0].CurrentFloor; i <= goToFloor; i++)
+                {
+                    await Task.Delay(1000);
+                    await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", userConnection.User, string.Format("lift is at - {0}",i));
+                }
+                await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", userConnection.User, "Lift has arrived");
             }
         }
 
