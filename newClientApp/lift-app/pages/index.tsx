@@ -48,8 +48,7 @@ const Home: NextPage = () => {
   const postLift = async () => {
     setLoading(true);
     await LiftsSVC.uploadLift(parseInt(currFloor), "Waiting", "", parseInt(floorLimit), restApi)
-    const lifts = await LiftsSVC.fetchUrl(`${restApi}/Lifts`);
-    setLifts(lifts);
+    await getLifts();
     setLoading(false);
   }
   const getLifts = async () => {
@@ -61,7 +60,7 @@ const Home: NextPage = () => {
   const startSignalR = async() => {
     try {
       const connection = new HubConnectionBuilder()
-          .withUrl("https://localhost:44390/chat")
+          .withUrl("https://localhost:44390/lifts")
           .configureLogging(LogLevel.Information)
           .build();
 
