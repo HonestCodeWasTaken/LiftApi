@@ -16,12 +16,14 @@ interface IMessageProps {
 }
 export const Message: React.FC<IMessageProps> = (props: IMessageProps) => {
   return (
-    <div style={{marginLeft:"15px"}}>
+    <div>
       <Heading mb={6}>
         {"Messages"}
       </Heading>
       <Divider></Divider>
+      <div style={{overflow:"auto", height:"500px"}}>
       {
+      
         props.messages.map((item, index) => {
           const { calledOn, currentFloor, status } = item;
           return (
@@ -29,6 +31,7 @@ export const Message: React.FC<IMessageProps> = (props: IMessageProps) => {
           )
         })
       }
+      </div>
     </div>
 
   )

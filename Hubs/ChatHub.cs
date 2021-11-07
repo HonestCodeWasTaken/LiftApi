@@ -54,6 +54,7 @@ namespace LiftApi.Hubs
             await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Opening up", currentFloor, idOfElevator, floorsElevatorCanGoUpTo);
             await Task.Delay(2000);
             await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Closing", currentFloor, idOfElevator, floorsElevatorCanGoUpTo);
+            await Task.Delay(2000);
             if (currentFloor < goToFloor)
             {
                 for (int i = currentFloor; i <= goToFloor; i++)
@@ -73,7 +74,9 @@ namespace LiftApi.Hubs
             await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Opening up", goToFloor, idOfElevator, floorsElevatorCanGoUpTo);
             await Task.Delay(2000);
             await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Closing", goToFloor, idOfElevator, floorsElevatorCanGoUpTo);
+            await Task.Delay(2000);
             await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Waiting", goToFloor, idOfElevator, floorsElevatorCanGoUpTo);
+            await Task.Delay(1000);
         }
 
         public Task SendUsersConnected(string room)

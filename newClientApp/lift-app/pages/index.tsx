@@ -48,12 +48,14 @@ const Home: NextPage = () => {
   const postLift = async () => {
     setLoading(true);
     await LiftsSVC.uploadLift(parseInt(currFloor), "Waiting", "", parseInt(floorLimit), restApi)
+    const lifts = await LiftsSVC.fetchUrl(`${restApi}/Lifts`);
+    setLifts(lifts);
     setLoading(false);
   }
   const getLifts = async () => {
     setLoading(true);
     const lifts = await LiftsSVC.fetchUrl(`${restApi}/Lifts`);
-    setLifts(lifts);
+    setTimeout(() => setLifts(lifts), 1000)
     setLoading(false);
   }
   const startSignalR = async() => {
@@ -66,9 +68,9 @@ const Home: NextPage = () => {
       connection.on("ReceiveMessage", async (time, status, floor, id, floorsItCanGoUpTo) => {
           LiftsSVC.uploadLiftLog(floor, status, restApi)
           LiftsSVC.putLift(floor, status, restApi, id, floorsItCanGoUpTo)
+          setMessages(messages => [...messages, {calledOn: time, status: status, currentFloor: floor} ]);
           const lifts = await LiftsSVC.fetchUrl(`${restApi}/Lifts`);
           setLifts(lifts);
-          setMessages(messages => [...messages, {calledOn: time, status: status, currentFloor: floor} ]);
           
       });
 
@@ -105,7 +107,8 @@ const Home: NextPage = () => {
             <Button onClick={postLift} ml={3} mb={3}>Post</Button>
           </span>
           <Button onClick={toggleColorMode} mt={6}>Dark mode</Button>
-          <Table variant="simple">
+          <div style={{height: "300px", overflow:"auto"}}> 
+          <Table  variant="simple">
           {loading && <Spinner mt={3} alignItems="center" justifyContent="center" display="flex" />}
             <TableCaption>Lifts</TableCaption>
             <Thead>
@@ -139,10 +142,9 @@ const Home: NextPage = () => {
               }
             </Tbody>
           </Table>
-
-
+          </div>
+          <Message  formBackground={formBackground} messages={messages}></Message>
         </Flex>
-        <Message  formBackground={formBackground} messages={messages}></Message>
       </Flex>
     </div>
   );
