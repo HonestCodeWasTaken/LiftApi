@@ -73,7 +73,7 @@ namespace LiftApi
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
-                endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapHub<LiftHub>("/lifts");
             });
 
             //app.UseSpa(spa =>
