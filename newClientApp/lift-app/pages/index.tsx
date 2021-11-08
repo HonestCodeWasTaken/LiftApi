@@ -122,7 +122,7 @@ const Home: NextPage = () => {
             </Thead>
             <Tbody>
               {lifts.map((item, index) => {
-                const { id, currentFloor, status, direction, floorsItCanGoUpTo } = item;
+                const { id, a : currentFloor, status, direction, floorsItCanGoUpTo } = item;
                 return (
                   <Tr key={index}>
                     <Td isNumeric>{currentFloor}</Td>
