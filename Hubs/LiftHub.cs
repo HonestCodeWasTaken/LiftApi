@@ -13,10 +13,22 @@ namespace LiftApi.Hubs
     {
         public async Task SendMessage(int currentFloor, int goToFloor, int idOfElevator, int floorsElevatorCanGoUpTo)
         {
-            if (floorsElevatorCanGoUpTo < goToFloor || goToFloor < 1)
+            try
             {
-                await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Bad floor selection", currentFloor, idOfElevator, floorsElevatorCanGoUpTo);
-                return;
+                if (floorsElevatorCanGoUpTo < goToFloor)
+                {
+                    await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Selected above possible floors elevator can go to", currentFloor, idOfElevator, floorsElevatorCanGoUpTo);
+                    throw new ArgumentOutOfRangeException("Selected above possible floors elevator can go to");
+                }
+            }
+            catch(NullReferenceException)
+            {
+                throw new NullReferenceException("Client isnt instantiated");
+            }
+            if (goToFloor < 1)
+            {
+                await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Cannot go to floor below 1st floor", currentFloor, idOfElevator, floorsElevatorCanGoUpTo);
+                throw new ArgumentOutOfRangeException("Cannot go to floor below 1st floor");
             }
             await Clients.All.SendAsync("ReceiveMessage", DateTime.Now, "Opening up", currentFloor, idOfElevator, floorsElevatorCanGoUpTo);
             await Task.Delay(2000);

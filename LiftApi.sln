@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiftApi", "LiftApi.csproj", "{BE6F7B7B-A052-4A3D-8148-5DD03E48D562}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitTest_LiftApi", "..\XUnitTest_LiftApi\XUnitTest_LiftApi.csproj", "{8012C68B-D086-4A17-A9B6-EBC4055CFA62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{BE6F7B7B-A052-4A3D-8148-5DD03E48D562}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE6F7B7B-A052-4A3D-8148-5DD03E48D562}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE6F7B7B-A052-4A3D-8148-5DD03E48D562}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8012C68B-D086-4A17-A9B6-EBC4055CFA62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8012C68B-D086-4A17-A9B6-EBC4055CFA62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8012C68B-D086-4A17-A9B6-EBC4055CFA62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8012C68B-D086-4A17-A9B6-EBC4055CFA62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
